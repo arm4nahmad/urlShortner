@@ -4,6 +4,7 @@ import axios from 'axios';
 function App() {
   const [url, setUrl] = useState('');
   const [shortenedUrl, setShortenedUrl] = useState('');
+  const [copySuccess, setCopySuccess] = useState(''); // Track if the copy was successful
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -12,6 +13,19 @@ function App() {
       setShortenedUrl(response.data.shortUrl);
     } catch (err) {
       console.error('Error shortening the URL', err);
+    }
+  };
+
+  const handleCopy = () => {
+    if (shortenedUrl) {
+      navigator.clipboard.writeText(shortenedUrl).then(() => {
+        setCopySuccess('URL copied to clipboard!'); // Set success message
+        setTimeout(() => setCopySuccess(''), 2000); // Reset after 2 seconds
+      }).catch(err => {
+        console.error('Failed to copy: ', err);
+        setCopySuccess('Failed to copy URL!'); // Show error if copy fails
+        setTimeout(() => setCopySuccess(''), 2000); // Reset error message after 2 seconds
+      });
     }
   };
 
@@ -43,6 +57,13 @@ function App() {
           >
             {shortenedUrl}
           </a>
+          <button
+            onClick={handleCopy}
+            className="ml-4 bg-green-500 text-white py-2 px-4 rounded-md"
+          >
+            Copy
+          </button>
+          {copySuccess && <p className="mt-2 text-green-500">{copySuccess}</p>} {/* Show confirmation message */}
         </div>
       )}
     </div>
